@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="columns">
+            <div class="column is-12">
+                <h1 class="title">{{name}}</h1>
+            </div>
+        </div>
+        <p class="subtitle">Own Stories</p>
+        {% include 'parts/stories.html' with stories=own_stories %}
+        <p class="subtitle">Voted Stories</p>
+        {% include 'parts/stories.html' with stories=voted_stories %}
+    </div>
+{% endblock %}

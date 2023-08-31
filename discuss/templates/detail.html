@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container">
+        <div class="columns">
+            <div class="column is-12">
+                <h1 class="title">{{ story.title }}</h1>
+                <div class="is-flex">
+                    {% if request.user != story.created_by %}
+                    <a href="{% url 'up_vote' story.id %}?next_page=story" class="mr-2" title="Up Vote">
+                        <span class="icon has-text-dark {% if vote_type == 'up_vote' %}has-text-success{% endif %}">
+                            <i class="fas fa-light fa-arrow-up"></i>
+                        </span>
+                    </a>
+                    {% endif %}
+                    <h2 class="subtitle">{{ story.number_of_votes }} votes</h2>
+                    {% if request.user != story.created_by %}
+                    <a href="{% url 'down_vote' story.id %}?next_page=story" class="ml-2" title="Down Vote">
+                        <span class="icon has-text-dark {% if vote_type == 'down_vote' %}has-text-success{% endif %}">
+                            <i class="fas fa-light fa-arrow-down"></i>
+                        </span>
+                    </a>
+                    {% endif %}
+                </div>
+            
+                <strong>By: </strong><a href="{% url 'else-account' story.created_by.username %}">{{ story.created_by.username }}</a> {{ story.created_at|timesince }} ago<br>
+                
+                {% if story.url %}
+                <strong>Visit: </strong><a href="{{ story.url }}" target="_blank">{{ story.url }}</a>
+                {% endif %}
+
+                <hr>
+
+                <p>{{ story.body }}</p>
+                
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column is-12">
+                <hr>
+
+                <h2 class="subtitle">Comments</h2>
+
+                {% for comment in story.comments.all %}
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="content">
+                                <p>
+                                    <strong>{{ comment.created_by.username }}</strong> <small>{{ comment.created_at|timesince }} ago</small><br>
+                                    {{ comment.body }}
+                                </p>
+                            </div>
+                        </div>
+                    </article>
+                {% empty %}
+                    <p>No comments yet!</p>
+                {% endfor %}
+
+                <hr>
+
+                <h2 class="subtitle">Add comment</h2>
+
+                {% if request.user.is_authenticated %}
+                    <form method="post" action=".">
+                        {% csrf_token %}
+
+                        {{ form|crispy }}
+
+                        <div class="field">
+                            <div class="field">
+                                <button class="button is-success">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                {% else %}
+                    <p>Please log in to comment!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
