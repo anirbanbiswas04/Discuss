@@ -5,7 +5,9 @@ from .models import Story, Vote
 
 
 def story(request, story_id):
-    story = get_object_or_404(Story, pk=story_id)
+    story = get_object_or_404(Story.objects.prefetch_related('comments')
+                              .prefetch_related('comments__created_by')
+                              .select_related('created_by'), pk=story_id)
     try:
         vote_type = get_object_or_404(Vote, story=story, vote_by=request.user).vote_type
     except:
@@ -43,7 +45,7 @@ def submit(request):
             story.created_by = request.user
             story.save()
 
-            return redirect('frontpage')
+            return redirect('story', story.pk)
     else:
         form = StoryForm()
 
@@ -54,48 +56,51 @@ def submit(request):
 def up_vote(request, story_id):
     story = get_object_or_404(Story, pk=story_id)
 
-    next_page = request.GET.get('next_page', '')
-
     if story.created_by != request.user:
-        if not Vote.objects.filter(story=story).filter(vote_by=request.user):
-            Story.up_vote(story)
-            Vote.objects.create(story=story, vote_by=request.user, vote_type='up_vote')
-        elif Vote.objects.filter(story=story).filter(vote_by=request.user).filter( vote_type='down_vote'):
-            Story.up_vote(story)
-            Story.up_vote(story)
-            Vote.objects.filter(story=story).filter(vote_by=request.user).update(vote_type='up_vote')
-        else:
-            vote = Vote.objects.filter(story=story).filter(vote_by=request.user).filter(vote_type='up_vote')
-            vote.delete()
-            Story.down_vote(story)
 
-    if next_page == 'story':
-        return redirect('story', story_id=story_id)
-    else:
-        return redirect('frontpage')
+        instance, created = Vote.objects.get_or_create(story=story, vote_by=request.user)        
+        
+        if created:
+            story.number_of_votes += 1
+        
+        if not created:
+            if instance.vote_type == Vote.DOWN_VOTE:
+                instance.vote_type = Vote.UP_VOTE
+                story.number_of_votes += 2
+                instance.save()
+
+            else:
+                instance.delete()
+                story.number_of_votes -= 1
+
+        story.save()
+    
+        return redirect('story', story.pk)
     
 
 @login_required
 def down_vote(request, story_id):
     story = get_object_or_404(Story, pk=story_id)
 
-    next_page = request.GET.get('next_page', '')
-
     if story.created_by != request.user:
-        if not Vote.objects.filter(story=story).filter(vote_by=request.user):
-            Story.down_vote(story)
-            Vote.objects.create(story=story, vote_by=request.user, vote_type='down_vote')
-        elif Vote.objects.filter(story=story).filter(vote_by=request.user).filter( vote_type='up_vote'):
-            Story.down_vote(story)
-            Story.down_vote(story)
-            Vote.objects.filter(story=story).filter(vote_by=request.user).update(vote_type='down_vote')
-        else:
-            vote = Vote.objects.filter(story=story).filter(vote_by=request.user).filter(vote_type='down_vote')
-            vote.delete()
-            Story.up_vote(story)
 
+        instance, created = Vote.objects.get_or_create(story=story, vote_by=request.user)
 
-    if next_page == 'story':
-        return redirect('story', story_id=story_id)
-    else:
-        return redirect('frontpage')
+        if created:
+            instance.vote_type = Vote.DOWN_VOTE
+            story.number_of_votes -= 1
+            instance.save()
+        
+        if not created:
+            if instance.vote_type == Vote.UP_VOTE:
+                instance.vote_type = Vote.DOWN_VOTE
+                story.number_of_votes -= 2
+                instance.save()
+
+            else:
+                instance.delete()
+                story.number_of_votes += 1
+
+        story.save()
+
+        return redirect('story', story.pk)

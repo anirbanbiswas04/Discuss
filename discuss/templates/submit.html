@@ -4,13 +4,8 @@
 {% block content %}
     <div class="container">
         <div class="columns">
-            <div class="column is-12">
+            <div class="column is-6 is-offset-3">
                 <h1 class="title">New story</h1>
-            </div>
-        </div>
-
-        <div class="columns">
-            <div class="column is-12">
                 <form method="post" action=".">
                     {% csrf_token %}
 
@@ -18,7 +13,11 @@
 
                     <div class="field">
                         <div class="control">
-                            <button class="button is-success">Submit</button>
+                            <button class="button is-success">
+                                <span class="icon">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </form>

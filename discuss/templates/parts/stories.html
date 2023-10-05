@@ -1,14 +1,21 @@
 <div class="columns">
-    <div class="column is-12">
-        <table class="table is-striped is-fullwidth">
+    <div class="column is-12" style="overflow-x: scroll;">
+        <table class="table">
             <tbody>
                 {% for story in stories %}
                     <tr>
                         <td>{{ forloop.counter }}.</td>
                         <td>
-                            <a {% if story.url %} href="{{ story.url }}" {% endif %} target="_blank">{{ story.title }}</a>
-                            <p>{{ story.number_of_votes }} vote(s) by {{ story.created_by.username }} {{ story.created_at|timesince }} ago | 
-                                <a href="{% url 'story' story.id %}">Discuss</a>
+                            <a href="{% url 'story' story.id %}">{{ story.title }}</a>
+                            <p>
+                                {{ story.number_of_votes }} 
+                                <span class="icon">
+                                    <i class="fa-regular fa-star"></i>
+                                </span> | 
+                                <span class="icon">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </span> {{ story.created_by.username }} | 
+                                {{ story.created_at|timesince }} ago
                             </p>
                         </td>
                     </tr>

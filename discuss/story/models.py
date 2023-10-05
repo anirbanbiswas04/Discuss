@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+
 class Story(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField(blank=True, null=True)
@@ -16,25 +17,22 @@ class Story(models.Model):
     
     def __str__(self):
         return '%s' % self.title
-    
-    def up_vote(self):
-        self.number_of_votes += 1
-        self.save()
-
-    def down_vote(self):
-        self.number_of_votes -= 1
-        self.save()
 
 
-VOTE_TYPE = (
-    ("up_vote", "Up Vote"),
-    ("down_vote", "Down Vote"),
-)
 
 class Vote(models.Model):
+
+    UP_VOTE = "up_vote"
+    DOWN_VOTE = "down_vote"
+
+    VOTE_TYPE = (
+    (UP_VOTE, "Up Vote"),
+    (DOWN_VOTE, "Down Vote"),
+    )
+    
     story = models.ForeignKey(Story, related_name='votes', on_delete=models.CASCADE)
     vote_by = models.ForeignKey(User, related_name='vote', on_delete=models.CASCADE)
-    vote_type = models.CharField(max_length=10, choices=VOTE_TYPE)
+    vote_type = models.CharField(max_length=10, choices=VOTE_TYPE, default=UP_VOTE)
 
     def __str__(self):
         return f'{self.story.title} - {self.vote_by.username}'

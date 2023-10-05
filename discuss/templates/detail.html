@@ -4,28 +4,28 @@
 
 {% block content %}
     <div class="container">
-        <div class="columns">
-            <div class="column is-12">
+        <div class="columns is-multiline">
+            <div class="column is-8 is-offset-2">
                 <h1 class="title">{{ story.title }}</h1>
                 <div class="is-flex">
-                    {% if request.user != story.created_by %}
-                    <a href="{% url 'up_vote' story.id %}?next_page=story" class="mr-2" title="Up Vote">
+                    {% if request.user != story.created_by and request.user.is_authenticated %}
+                    <a href="{% url 'up_vote' story.id %}" class="mr-2">
                         <span class="icon has-text-dark {% if vote_type == 'up_vote' %}has-text-success{% endif %}">
                             <i class="fas fa-light fa-arrow-up"></i>
                         </span>
                     </a>
-                    {% endif %}
                     <h2 class="subtitle">{{ story.number_of_votes }} votes</h2>
-                    {% if request.user != story.created_by %}
-                    <a href="{% url 'down_vote' story.id %}?next_page=story" class="ml-2" title="Down Vote">
+                    <a href="{% url 'down_vote' story.id %}" class="ml-2">
                         <span class="icon has-text-dark {% if vote_type == 'down_vote' %}has-text-success{% endif %}">
                             <i class="fas fa-light fa-arrow-down"></i>
                         </span>
                     </a>
+                    {% else %}
+                    <h2 class="subtitle">{{ story.number_of_votes }} votes</h2>
                     {% endif %}
                 </div>
             
-                <strong>By: </strong><a href="{% url 'else-account' story.created_by.username %}">{{ story.created_by.username }}</a> {{ story.created_at|timesince }} ago<br>
+                <strong>By: </strong><a href="{% url 'account' %}?user={{story.created_by}}">{{ story.created_by.username }}</a> {{ story.created_at|timesince }} ago<br>
                 
                 {% if story.url %}
                 <strong>Visit: </strong><a href="{{ story.url }}" target="_blank">{{ story.url }}</a>
@@ -33,14 +33,13 @@
 
                 <hr>
 
-                <p>{{ story.body }}</p>
+                <p>{{ story.body|linebreaks|urlize }}</p>
                 
             </div>
         </div>
 
         <div class="columns">
-            <div class="column is-12">
-                <hr>
+            <div class="column is-6 is-offset-3">
 
                 <h2 class="subtitle">Comments</h2>
 

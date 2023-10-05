@@ -6,7 +6,7 @@ SECRET_KEY = 'django-insecure-o+x2wqix)7-2!g53d#b0q&sl-ya17%1*(mh+kss-wzxrdz-60d
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     "crispy_bulma",
 ]
+
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bulma",)
 CRISPY_TEMPLATE_PACK = "bulma"
