@@ -25,7 +25,7 @@
                     {% endif %}
                 </div>
             
-                <strong>By: </strong><a href="{% url 'account' %}?user={{story.created_by}}">{{ story.created_by.username }}</a> {{ story.created_at|timesince }} ago<br>
+                <strong>By: </strong><a href="{% url 'account' %}?userid={{story.created_by.id}}">{{ story.created_by.username }}</a> {{ story.created_at|timesince }} ago<br>
                 
                 {% if story.url %}
                 <strong>Visit: </strong><a href="{{ story.url }}" target="_blank">{{ story.url }}</a>
